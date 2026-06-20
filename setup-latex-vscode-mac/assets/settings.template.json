@@ -1,0 +1,68 @@
+{
+  // ============================================================================
+  //  LaTeX Workshop — local Overleaf config template
+  //
+  //  Copy to <project>/.vscode/settings.json and substitute the placeholders:
+  //    <TEX_BIN_DIR>   the TeX distribution's bin directory.
+  //                    MacTeX:   /Library/TeX/texbin
+  //                    (verify with:  dirname "$(which latexmk)" )
+  //    <MAIN_TEX>      the main .tex filename, e.g. main.tex / resume.tex
+  //
+  //  Engine note: this template uses XeLaTeX (-xelatex), required for ctex/CJK
+  //  and safe for modern fontspec documents. For a plain ASCII document you can
+  //  switch the flag to -pdf (pdflatex) or -lualatex.
+  // ============================================================================
+
+  // Let a GUI-launched VSCode find the TeX binaries (it does NOT inherit the
+  // shell PATH). This is the #1 cause of "spawn latexmk ENOENT".
+  "latex-workshop.latex.path": "<TEX_BIN_DIR>",
+
+  // Recompile on every save (Overleaf-style).
+  "latex-workshop.latex.autoBuild.run": "onSave",
+
+  // Preview the PDF in a VSCode tab (open side-by-side with the SyncTeX command).
+  "latex-workshop.view.pdf.viewer": "tab",
+
+  // One recipe -> one tool.
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "latexmk (xelatex)",
+      "tools": ["latexmk-xelatex"]
+    }
+  ],
+  // Must name a RECIPE, not a tool. "first" robustly picks the first recipe and
+  // avoids "Failed to resolve build recipe".
+  "latex-workshop.latex.recipe.default": "first",
+
+  "latex-workshop.latex.tools": [
+    {
+      "name": "latexmk-xelatex",
+      // Absolute path so it works regardless of how VSCode was launched.
+      "command": "<TEX_BIN_DIR>/latexmk",
+      "args": [
+        "-xelatex",
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "-outdir=%OUTDIR%",
+        "%DOC%"
+      ],
+      // latexmk shells out to the engine, so it needs the TeX bin dir on PATH too.
+      "env": {
+        "PATH": "<TEX_BIN_DIR>:/usr/bin:/bin:/usr/sbin:/sbin"
+      }
+    }
+  ],
+
+  // Keep the source folder clean: artifacts go to a build/ subdir...
+  "latex-workshop.latex.outDir": "%DIR%/build",
+
+  // ...and aux files are cleaned after each build (PDF + synctex are kept).
+  "latex-workshop.latex.autoClean.run": "onBuilt",
+  "latex-workshop.latex.clean.fileTypes": [
+    "*.aux", "*.bbl", "*.blg", "*.idx", "*.ind", "*.lof", "*.lot",
+    "*.out", "*.toc", "*.acn", "*.acr", "*.alg", "*.glg", "*.glo",
+    "*.gls", "*.fls", "*.log", "*.fdb_latexmk", "*.snm", "*.synctex(busy)",
+    "*.nav", "*.vrb"
+  ]
+}
