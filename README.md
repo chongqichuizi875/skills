@@ -42,6 +42,26 @@ fresh session（防认知死循环）、停滞检测与强制 pivot、方向多�
 > **https://github.com/chongqichuizi875/projects** 。单独使用本仓两个 skill 也可以，缺失的资源按各
 > SKILL.md 顶部"外部依赖与获取地址"去取。
 
+### `infra-verification`
+
+写系统/基础设施代码（GPU runtime、checkpoint/restore、分布式通信、存储 I/O）时判断**「测够了没有」**
+的方法论。核心论点：端到端跑通只证明「这台机器上、一切顺利时」是对的，证明不了三类东西——
+**没被执行的分支**（→ 静态类型检查，量 delta 不量绝对值）、**只在失败时走的分支**
+（→ 错误注入单元测试，不走全链路）、**换个环境才走到的分支**（→ 环境能力探测 + 显式 skip）。
+另含 A/B 性能测量口径（同起点复位、冷 L2、对 oracle 比而非两个近似互比、形状分布加权、
+先断言有限性再比较）与「结论必须带边界、负面结果照写」。
+附 [postmortem.md](infra-verification/postmortem.md)：一次真实 PR 的复盘——337 个测试全绿、lint 干净，
+审阅者仍找出三个真 bug，逐个拆解它们分别属于哪一类、为什么结构性地碰不到。
+
+### `gpu-box-ops`
+
+在共享多卡 GPU 机器上做 kernel / 系统级 infra 的**工程实践**：占卡 lease 礼仪与还卡
+（`flock ... sleep infinity` 会留孤儿，要杀进程组）、跑完清理残留进程与 /dev/shm、
+远程迭代回路（base64 绕开多层引号转义、`git ls-files | tar` 增量同步、后台跑 + 轮询日志、
+`trap` 保证还卡），以及只有在真机上才会撞到的坑：CRIU 版本门禁与 rseq / `//deleted` 挂载 /
+必须把 criu 自己的 stderr 带出来、NCCL 在独立 netns 里的三个环境变量、
+容器里 torch 没装 numpy、国内源与代理（`Proxy CONNECT aborted` 时先试直连）。
+
 ### `setup-latex-vscode-mac`
 
 Set up a local LaTeX authoring environment on macOS that mirrors the Overleaf experience —
